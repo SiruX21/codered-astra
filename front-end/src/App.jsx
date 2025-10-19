@@ -7,11 +7,22 @@ import { DefaultApp } from "./pages/Default";
 
 function App() {
   const initialSeconds = 6;
+
   const [seconds, setSeconds] = useState(initialSeconds);
   const [timerActive, setTimerActive] = useState(false);
+  
+  const [agree, setAgree] = useState(false);
+  const [isMainPage, setIsMainPage] = useState(false);
+
+  useEffect(() => {
+    document.body.style.backgroundImage = "";
+    document.body.style.backgroundColor = "black";
+    document.body.style.backgroundSize = "contain";
+  });
 
   useEffect(() => {
     let interval = null;
+
     if (timerActive && seconds > 0) {
       interval = setInterval(() => {
         setSeconds((prevSeconds) => prevSeconds - 1);
@@ -21,11 +32,9 @@ function App() {
       setTimerActive(false); // Stop the timer when it reaches 0
       setIsMainPage(true);
     }
+
     return () => clearInterval(interval); // Cleanup on component unmount or timer stop
   }, [timerActive, seconds]);
-
-  const [agree, setAgree] = useState(false);
-  const [isMainPage, setIsMainPage] = useState(false);
 
   const handleTermsAgree = () => {
     setAgree(true);
@@ -38,12 +47,6 @@ function App() {
   }
 
   if (!agree) {
-    useEffect(() => {
-      document.body.style.backgroundImage = "";
-      document.body.style.backgroundColor = "black";
-      document.body.style.backgroundSize = "contain";
-    });
-
     return (
       <>
         <div className="flex flex-col bg-[#691125] items-center min-h-screen text-white">
@@ -54,7 +57,9 @@ function App() {
           <section className="bg-red-500 h-300px w-200px text-white">
             <h1 className="font-bold p-10">THIS IS A TERMS OF AGREEMENT</h1>
 
-            <h1 className="p-10">SAY HELLO TO YOUR GREATEST INTERVENTION</h1>
+            <h1 className="p-10">
+              SAY HELLO TO YOUR GREATEST DIVINE INTERENTION
+            </h1>
             <h1 className="p-10">
               YOUR ENTIRE IDENTITY SHALL SUMMON A MAGNIFICIENT NEW CREATURE
             </h1>

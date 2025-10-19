@@ -24,8 +24,8 @@ function Instructions() {
               <h1 className="text-black">Step 1.</h1>
               <h2 className="text-black text-3xl">
                 Take a picture of your whole body selfie! Like this image on
-                right.
-                Use the camera button to take a live picture of your whole body selfie!
+                right. Use the camera button to take a live picture of your
+                whole body selfie!
               </h2>
             </div>
 
@@ -88,10 +88,14 @@ function Instructions() {
 
 export function DefaultApp() {
   useEffect(() => {
-    document.body.style.backgroundImage = "url(main/bgs/main1.jpg)";
+    document.body.style.backgroundImage = "url(/main/bgs/main1.jpg)"; // use /public path form
     document.body.style.backgroundSize = "contain";
-  });
-
+    return () => {
+      document.body.style.backgroundImage = "";
+      document.body.style.backgroundSize = "";
+    };
+  }, []);
+  
   return (
     <div className="!bg-[#f7c3ef] h-full w- p-10 flex flex-col items-center bg-black text-white space-y-9">
       <div className="bg-black p-10 space-y-4">
