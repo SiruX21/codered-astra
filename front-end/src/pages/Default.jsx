@@ -99,7 +99,7 @@ export function DefaultApp() {
 
   return (
     <div className="flex flex-col">
-      <div className="!bg-[#f7c3ef] h-full w-full flex flex-col items-center bg-black text-white space-y-9">
+      <div className="pt-10 !bg-[#f7c3ef] h-full w-full flex flex-col items-center bg-black text-white space-y-9">
         <div className="bg-black p-10 space-y-5">
           <h1 className="text-[2.7rem]! font-bold text-white">
             "The righteous care for the needs of their animals,"

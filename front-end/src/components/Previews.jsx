@@ -258,7 +258,7 @@ export function Previews() {
             <div className="relative bg-black rounded-xl overflow-hidden shadow-inner mb-6">
               <video 
                 ref={videoRef} 
-                autoPlay 
+                autoPlay
                 playsInline
                 muted
                 className="w-full h-auto max-h-[60vh] object-contain"
