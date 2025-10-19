@@ -3,6 +3,11 @@ from werkzeug.utils import secure_filename
 import os
 from PIL import Image
 import io
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -10,6 +15,13 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'}
 MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
+
+# Configure Google Gemini API
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+if not GOOGLE_API_KEY:
+    print("WARNING: GOOGLE_API_KEY not found in environment variables!")
+else:
+    genai.configure(api_key=GOOGLE_API_KEY)
 
 # Create upload folder if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -24,13 +36,20 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/upload-image', methods=['POST'])
-def upload_image():
+@app.route('/analyze-image', methods=['POST'])
+def analyze_image():
     """
-    Endpoint to receive an image file
-    Expects: multipart/form-data with 'image' field
-    Returns: JSON response with image details
+    Endpoint to receive an image file and analyze it with Google Gemini
+    Expects: multipart/form-data with 'image' field and optional 'prompt' field
+    Returns: JSON response with Gemini's analysis
     """
+    # Check if API key is configured
+    if not GOOGLE_API_KEY:
+        return jsonify({
+            'error': 'API key not configured',
+            'message': 'Please set GOOGLE_API_KEY in your .env file'
+        }), 500
+    
     # Check if image is in the request
     if 'image' not in request.files:
         return jsonify({
@@ -64,7 +83,6 @@ def upload_image():
         # Get image information
         width, height = image.size
         format_type = image.format
-        mode = image.mode
         
         # Optional: Save the image to disk
         filename = secure_filename(file.filename)
@@ -74,26 +92,40 @@ def upload_image():
         file.seek(0)
         file.save(filepath)
         
+        # Get custom prompt or use default
+        prompt = request.form.get('prompt', 'Describe this image in detail.')
+        
+        # Send image to Google Gemini API
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # Reset image pointer for Gemini
+        image.seek(0) if hasattr(image, 'seek') else None
+        
+        # Generate response from Gemini
+        response = model.generate_content([prompt, image])
+        
         # Prepare response
-        response = {
+        result = {
             'success': True,
-            'message': 'Image received successfully',
+            'message': 'Image analyzed successfully',
             'image_details': {
                 'filename': filename,
                 'width': width,
                 'height': height,
                 'format': format_type,
-                'mode': mode,
-                'size_bytes': len(image_data),
                 'saved_path': filepath
+            },
+            'gemini_response': {
+                'text': response.text,
+                'prompt_used': prompt
             }
         }
         
-        return jsonify(response), 200
+        return jsonify(result), 200
         
     except Exception as e:
         return jsonify({
-            'error': 'Failed to process image',
+            'error': 'Failed to analyze image',
             'message': str(e)
         }), 500
 
