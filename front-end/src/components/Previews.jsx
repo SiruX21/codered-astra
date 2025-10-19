@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 export function Previews() {
   const [file, setFile] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const [response, setResponse] = useState(null);
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({
@@ -99,9 +100,25 @@ export function Previews() {
             className="w-16 h-16 md:w-24 md:h-24 opacity-70"
           />
 
-          {/* Processing status */}
-          <div className="flex flex-col justify-center items-center">
-            <h1 className="text-4xl font-bold rainbow-text">Processing...</h1>
+          {/* Response display */}
+          <div className="flex flex-col justify-center items-center max-w-md">
+            {processing ? (
+              <h1 className="text-4xl font-bold rainbow-text">Processing...</h1>
+            ) : response ? (
+              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">Your Fursona:</h2>
+                <img 
+                  src={`/${response.trim().toLowerCase()}.PNG`} 
+                  alt={response}
+                  className="w-full max-w-sm rounded-lg shadow-md"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/placeholder.png'; // fallback image
+                  }}
+                />
+                <p className="text-gray-700 text-center mt-4 text-xl font-semibold capitalize">{response}</p>
+              </div>
+            ) : null}
           </div>
         </div>
       )}
