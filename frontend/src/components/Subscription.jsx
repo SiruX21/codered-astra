@@ -7,6 +7,7 @@ export default function Subscription() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [stripeEnabled, setStripeEnabled] = useState(true);
 
   useEffect(() => {
     loadPlans();
@@ -16,6 +17,7 @@ export default function Subscription() {
     try {
       const data = await api.getPlans();
       setPlans(data.plans);
+      setStripeEnabled(data.stripeEnabled !== false);
     } catch (err) {
       setError('Failed to load plans');
     }
@@ -23,6 +25,11 @@ export default function Subscription() {
 
   const handleSubscribe = async (plan) => {
     if (plan.id === 'free') return;
+
+    if (!stripeEnabled) {
+      setError('Paid subscriptions are not available. Stripe is not configured.');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -37,6 +44,11 @@ export default function Subscription() {
   };
 
   const handleManageSubscription = async () => {
+    if (!stripeEnabled) {
+      setError('Subscription management is not available. Stripe is not configured.');
+      return;
+    }
+
     setLoading(true);
     try {
       const { url } = await api.createPortalSession();
@@ -77,6 +89,12 @@ export default function Subscription() {
           </div>
         )}
       </div>
+
+      {!stripeEnabled && (
+        <div className="bg-blue-500 text-white px-6 py-4 rounded-lg text-center mb-8 max-w-2xl mx-auto">
+          ℹ️ Paid subscriptions are not available. Only the free tier is active.
+        </div>
+      )}
 
       {error && (
         <div className="bg-red-500 text-white px-6 py-4 rounded-lg text-center mb-8 animate-shake max-w-2xl mx-auto">
@@ -123,7 +141,7 @@ export default function Subscription() {
 
             <button
               onClick={() => handleSubscribe(plan)}
-              disabled={loading || subscription?.plan_type === plan.id || plan.id === 'free'}
+              disabled={loading || subscription?.plan_type === plan.id || plan.id === 'free' || (!stripeEnabled && plan.id !== 'free')}
               className={`w-full py-4 text-lg font-bold rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                 subscription?.plan_type === plan.id
                   ? 'bg-green-500 text-white'
@@ -132,7 +150,8 @@ export default function Subscription() {
             >
               {loading ? 'Processing...' : 
                subscription?.plan_type === plan.id ? 'Current Plan' :
-               plan.id === 'free' ? 'Free Forever' : 'Subscribe'}
+               plan.id === 'free' ? 'Free Forever' : 
+               !stripeEnabled ? 'Not Available' : 'Subscribe'}
             </button>
           </div>
         ))}

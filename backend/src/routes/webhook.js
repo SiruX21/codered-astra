@@ -3,10 +3,22 @@ import Stripe from 'stripe';
 import db from '../db/database.js';
 
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Check if Stripe is configured
+const isStripeEnabled = !!(
+  process.env.STRIPE_SECRET_KEY && 
+  process.env.STRIPE_WEBHOOK_SECRET
+);
+
+const stripe = isStripeEnabled ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 // Stripe webhook endpoint
 router.post('/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  if (!isStripeEnabled) {
+    console.warn('⚠️  Received webhook but Stripe is not configured');
+    return res.status(503).json({ error: 'Stripe is not configured' });
+  }
+
   const sig = req.headers['stripe-signature'];
   let event;
 

@@ -4,56 +4,84 @@ import db from '../db/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Check if Stripe is configured
+const isStripeEnabled = !!(
+  process.env.STRIPE_SECRET_KEY && 
+  process.env.STRIPE_WEBHOOK_SECRET &&
+  process.env.BASIC_PLAN_PRICE_ID &&
+  process.env.PRO_PLAN_PRICE_ID
+);
+
+const stripe = isStripeEnabled ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+
+if (!isStripeEnabled) {
+  console.warn('⚠️  Stripe is not configured. Subscription features will be disabled.');
+  console.warn('   Only the free tier will be available.');
+}
 
 // Get subscription plans
 router.get('/plans', async (req, res) => {
+  const plans = [
+    {
+      id: 'free',
+      name: 'Free',
+      price: 0,
+      generations: 5,
+      features: [
+        '5 fursona generations per month',
+        'Basic AI quality',
+        'Community support'
+      ]
+    }
+  ];
+
+  // Only include paid plans if Stripe is enabled
+  if (isStripeEnabled) {
+    plans.push({
+      id: 'basic',
+      name: 'Basic',
+      price: 9.99,
+      priceId: process.env.BASIC_PLAN_PRICE_ID,
+      generations: 50,
+      features: [
+        '50 fursona generations per month',
+        'Enhanced AI quality',
+        'Priority support',
+        'Save generation history'
+      ]
+    });
+    plans.push({
+      id: 'pro',
+      name: 'Pro',
+      price: 19.99,
+      priceId: process.env.PRO_PLAN_PRICE_ID,
+      generations: -1, // unlimited
+      features: [
+        'Unlimited fursona generations',
+        'Best AI quality',
+        'Priority support',
+        'Save generation history',
+        'Early access to new features'
+      ]
+    });
+  }
+
   res.json({
-    plans: [
-      {
-        id: 'free',
-        name: 'Free',
-        price: 0,
-        generations: 5,
-        features: [
-          '5 fursona generations per month',
-          'Basic AI quality',
-          'Community support'
-        ]
-      },
-      {
-        id: 'basic',
-        name: 'Basic',
-        price: 9.99,
-        priceId: process.env.BASIC_PLAN_PRICE_ID,
-        generations: 50,
-        features: [
-          '50 fursona generations per month',
-          'Enhanced AI quality',
-          'Priority support',
-          'Save generation history'
-        ]
-      },
-      {
-        id: 'pro',
-        name: 'Pro',
-        price: 19.99,
-        priceId: process.env.PRO_PLAN_PRICE_ID,
-        generations: -1, // unlimited
-        features: [
-          'Unlimited fursona generations',
-          'Best AI quality',
-          'Priority support',
-          'Save generation history',
-          'Early access to new features'
-        ]
-      }
-    ]
+    plans,
+    stripeEnabled: isStripeEnabled
   });
 });
 
 // Create checkout session
 router.post('/create-checkout', authenticateToken, async (req, res) => {
+  if (!isStripeEnabled) {
+    return res.status(503).json({ 
+      error: 'Stripe is not configured. Paid subscriptions are not available.',
+      stripeEnabled: false
+    });
+  }
+
   try {
     const { priceId, planType } = req.body;
 
@@ -107,6 +135,13 @@ router.post('/create-checkout', authenticateToken, async (req, res) => {
 
 // Create customer portal session
 router.post('/create-portal', authenticateToken, async (req, res) => {
+  if (!isStripeEnabled) {
+    return res.status(503).json({ 
+      error: 'Stripe is not configured. Subscription management is not available.',
+      stripeEnabled: false
+    });
+  }
+
   try {
     const [subscriptions] = await db.query(
       'SELECT stripe_customer_id FROM subscriptions WHERE user_id = ?',
