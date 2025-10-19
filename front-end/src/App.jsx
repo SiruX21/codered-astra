@@ -48,7 +48,7 @@ function App() {
   if (!agree) {
     return (
       <div className="flex w-full justify-center">
-        <img className="w-[700px]" src="/main/bgs/agreement/left.png"/>
+        <img className="w-[700px]" src="/main/bgs/left.png"/>
 
         <div className="w-[1280px] flex flex-col bg-[#691125] items-center min-h-screen text-white">
           <a className="text-4xl" href="/">
@@ -74,7 +74,7 @@ function App() {
           </button>
         </div>
 
-        <img className="w-[700px]" src="/main/bgs/agreement/right.png"/>
+        <img className="w-[700px]" src="/main/bgs/right.png"/>
       </div>
     );
   } else {
