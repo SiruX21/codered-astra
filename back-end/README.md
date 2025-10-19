@@ -46,6 +46,7 @@ Upload an image file and get AI analysis from Google Gemini.
 - Body: 
   - `image` (file, required): The image file to analyze
   - `prompt` (string, optional): Custom prompt for analysis (default: "Describe this image in detail.")
+  - `system_prompt` (string, optional): Custom system instruction to guide the AI's behavior and response style
 
 **Response:**
 ```json
@@ -61,7 +62,8 @@ Upload an image file and get AI analysis from Google Gemini.
   },
   "gemini_response": {
     "text": "This image shows a beautiful sunset over the ocean...",
-    "prompt_used": "Describe this image in detail."
+    "prompt_used": "Describe this image in detail.",
+    "system_prompt_used": "You are a helpful AI assistant..."
   }
 }
 ```
@@ -89,6 +91,13 @@ curl -X POST \
   -F "image=@/path/to/your/image.jpg" \
   -F "prompt=What colors are dominant in this image?" \
   http://localhost:5000/analyze-image
+
+# With custom system prompt
+curl -X POST \
+  -F "image=@/path/to/your/image.jpg" \
+  -F "prompt=Analyze this image" \
+  -F "system_prompt=You are an expert photographer. Analyze images focusing on composition, lighting, and technical aspects." \
+  http://localhost:5000/analyze-image
 ```
 
 ### Using the test script:
@@ -98,6 +107,9 @@ python test_upload.py /path/to/your/image.jpg
 
 # With custom prompt
 python test_upload.py /path/to/your/image.jpg "What objects are in this image?"
+
+# With custom system prompt
+python test_upload.py photo.jpg "Analyze this" --system-prompt "You are an art critic"
 ```
 
 ### Using Python requests:
@@ -116,6 +128,15 @@ files = {'image': open('image.jpg', 'rb')}
 data = {'prompt': 'What is the main subject of this image?'}
 response = requests.post(url, files=files, data=data)
 print(response.json())
+
+# With custom system prompt
+files = {'image': open('image.jpg', 'rb')}
+data = {
+    'prompt': 'Describe this image',
+    'system_prompt': 'You are a professional photographer. Focus on technical aspects like composition, lighting, and color balance.'
+}
+response = requests.post(url, files=files, data=data)
+print(response.json())
 ```
 
 ## Configuration
@@ -125,6 +146,31 @@ You can modify these settings in `main.py`:
 - `UPLOAD_FOLDER`: Directory where uploaded images are saved (default: 'uploads')
 - `ALLOWED_EXTENSIONS`: Set of allowed file extensions
 - `MAX_FILE_SIZE`: Maximum file size in bytes (default: 16MB)
+- `DEFAULT_SYSTEM_PROMPT`: Default system instruction for Gemini AI
+
+### System Prompt Examples
+
+The system prompt defines how the AI behaves. Here are some examples:
+
+**Art Critic:**
+```python
+"You are an experienced art critic. Analyze images with focus on artistic techniques, composition, color theory, and historical context."
+```
+
+**Technical Photographer:**
+```python
+"You are a professional photographer. Evaluate images based on technical aspects: exposure, composition, lighting, focus, and post-processing."
+```
+
+**Accessibility Expert:**
+```python
+"You are an accessibility expert. Describe images in detail for visually impaired users, including all relevant visual information, text, and context."
+```
+
+**Product Analyst:**
+```python
+"You are a product analyst. Identify and describe products in images, including brand, condition, features, and potential use cases."
+```
 
 ## Error Codes
 

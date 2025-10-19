@@ -1,12 +1,12 @@
 """
 Test script to upload an image to the Flask endpoint and get Gemini analysis
-Usage: python test_upload.py <image_path> [prompt]
+Usage: python test_upload.py <image_path> [prompt] [--system-prompt "your system prompt"]
 """
 import requests
 import sys
 import json
 
-def test_upload(image_path, prompt=None):
+def test_upload(image_path, prompt=None, system_prompt=None):
     """Test the image analysis endpoint with Gemini"""
     url = 'http://localhost:5000/analyze-image'
     
@@ -18,6 +18,10 @@ def test_upload(image_path, prompt=None):
             # Add custom prompt if provided
             if prompt:
                 data['prompt'] = prompt
+            
+            # Add custom system prompt if provided
+            if system_prompt:
+                data['system_prompt'] = system_prompt
             
             response = requests.post(url, files=files, data=data)
             
@@ -35,13 +39,29 @@ def test_upload(image_path, prompt=None):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print("Usage: python test_upload.py <image_path> [prompt]")
-        print("\nExample:")
+        print("Usage: python test_upload.py <image_path> [prompt] [--system-prompt 'your system prompt']")
+        print("\nExamples:")
         print("  python test_upload.py photo.jpg")
         print("  python test_upload.py photo.jpg 'What objects are in this image?'")
+        print("  python test_upload.py photo.jpg 'Describe this' --system-prompt 'You are an art critic'")
         sys.exit(1)
     
     image_path = sys.argv[1]
-    prompt = ' '.join(sys.argv[2:]) if len(sys.argv) > 2 else None
+    prompt = None
+    system_prompt = None
     
-    test_upload(image_path, prompt)
+    # Parse arguments
+    i = 2
+    temp_prompt = []
+    while i < len(sys.argv):
+        if sys.argv[i] == '--system-prompt' and i + 1 < len(sys.argv):
+            system_prompt = sys.argv[i + 1]
+            i += 2
+        else:
+            temp_prompt.append(sys.argv[i])
+            i += 1
+    
+    if temp_prompt:
+        prompt = ' '.join(temp_prompt)
+    
+    test_upload(image_path, prompt, system_prompt)

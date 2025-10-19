@@ -23,6 +23,28 @@ if not GOOGLE_API_KEY:
 else:
     genai.configure(api_key=GOOGLE_API_KEY)
 
+# Default system prompt for Gemini
+DEFAULT_SYSTEM_PROMPT = """Using the description of the image, you are picking a fursona below from the list that most resonates with this image.
+mouse
+pig
+fox
+hedgehog
+glowfish
+goldfish
+cow
+giraffe
+shrimp
+elephant
+cougar
+cat
+chicken
+snake
+squirrel
+Pick the one that best matches the image’s vibe, personality, or appearance.
+Pick the best word that fits with this image and only respond with that word.
+Respond only with the exact word from the list. No punctuation, explanation, or other text.
+"""
+
 # Create upload folder if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -95,14 +117,20 @@ def analyze_image():
         # Get custom prompt or use default
         prompt = request.form.get('prompt', 'Describe this image in detail.')
         
+        # Get custom system prompt or use default
+        system_prompt = request.form.get('system_prompt', DEFAULT_SYSTEM_PROMPT)
+        
+        # Combine system prompt with user prompt
+        full_prompt = f"{system_prompt}\n\nUser request: {prompt}"
+        
         # Send image to Google Gemini API
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
         
         # Reset image pointer for Gemini
         image.seek(0) if hasattr(image, 'seek') else None
         
         # Generate response from Gemini
-        response = model.generate_content([prompt, image])
+        response = model.generate_content([full_prompt, image])
         
         # Prepare response
         result = {
@@ -117,7 +145,8 @@ def analyze_image():
             },
             'gemini_response': {
                 'text': response.text,
-                'prompt_used': prompt
+                'prompt_used': prompt,
+                'system_prompt_used': system_prompt
             }
         }
         
