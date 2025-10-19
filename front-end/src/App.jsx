@@ -25,7 +25,7 @@ function App() {
   }, [timerActive, seconds]);
 
   const [agree, setAgree] = useState(false);
-  const [isMainPage, setIsMainPage] = useState(true);
+  const [isMainPage, setIsMainPage] = useState(false);
 
   const handleTermsAgree = () => {
     setAgree(true);
