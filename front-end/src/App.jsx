@@ -58,7 +58,7 @@ function App() {
             <h1 className="font-bold p-10">THIS IS A TERMS OF AGREEMENT</h1>
 
             <h1 className="p-10">
-              SAY HELLO TO YOUR GREATEST DIVINE INTERENTION
+              SAY HELLO TO YOUR GREATEST DIVINE INTERVENTION
             </h1>
             <h1 className="p-10">
               YOUR ENTIRE IDENTITY SHALL SUMMON A MAGNIFICIENT NEW CREATURE

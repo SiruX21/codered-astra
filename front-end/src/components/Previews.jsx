@@ -237,7 +237,7 @@ export function Previews() {
   }, [file, stream]);
 
   return (
-    <section className="container mx-auto px-6 py-10">
+    <section className="container mx-auto px-6 py-10 w-250">
       {/* Camera Modal - Seamless overlay */}
       {showCamera && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black bg-opacity-30">
