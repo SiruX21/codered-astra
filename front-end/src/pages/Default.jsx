@@ -13,7 +13,7 @@ function Instructions() {
     <>
       <div>
         <h1 className="mb-3 font-bold">
-          <span className="rainbow-text">HOW TO USE THE MACHINE!</span>
+          <span className="rainbow-text">HOW TO USE THE FURSONA MACHINE!</span>
         </h1>
       </div>
 
@@ -130,11 +130,8 @@ export function DefaultApp() {
             className="bg-white text-black border-2"
             onSubmit={(e) => {
               e.preventDefault();
-
-              // Now get the form data as you regularly would
-              const formData = new FormData(e.currentTarget);
-              const file = formData.get("my-file");
-              alert(file.name);
+              // Previews component handles file upload internally
+              // No need to process form data here
             }}
           >
             <Previews />
