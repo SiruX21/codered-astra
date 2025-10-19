@@ -86,6 +86,7 @@ lion
 alligator
 racoon
 cockroach
+tiger
 Pick the one that best matches the image's vibe. Pick Squirrel and elephant less, squirrel gets picked a lot - try to pick every animal equally.
 
 IMPORTANT: Your response MUST start with the animal name as the first word, followed by a description explaining why you chose that animal based on the image's characteristics, colors, mood, or energy. 
