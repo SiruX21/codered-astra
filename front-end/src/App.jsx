@@ -8,7 +8,7 @@ import { DefaultApp } from "./pages/normal";
 function App() {
   // const [count, setCount] = useState(0)
   const [agree, setAgree] = useState(false);
-  const [isMainPage, setIsMainPage] = useState(false);
+  const [isMainPage, setIsMainPage] = useState(true);
 
   const handleTermsAgree = () => {
     setAgree(true);
