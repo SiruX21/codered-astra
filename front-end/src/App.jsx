@@ -17,7 +17,6 @@ function App() {
   useEffect(() => {
     document.body.style.backgroundImage = "";
     document.body.style.backgroundColor = "black";
-    document.body.style.backgroundSize = "contain";
   });
 
   useEffect(() => {
@@ -48,8 +47,10 @@ function App() {
 
   if (!agree) {
     return (
-      <>
-        <div className="flex flex-col bg-[#691125] items-center min-h-screen text-white">
+      <div className="flex w-full justify-center">
+        <img className="w-[700px]" src="/main/bgs/agreement/left.png"/>
+
+        <div className="w-[1280px] flex flex-col bg-[#691125] items-center min-h-screen text-white">
           <a className="text-4xl" href="/">
             <img src={fursonaLogo} className="logo" alt="fursona logo" />
           </a>
@@ -72,7 +73,9 @@ function App() {
             </p>
           </button>
         </div>
-      </>
+
+        <img className="w-[700px]" src="/main/bgs/agreement/right.png"/>
+      </div>
     );
   } else {
     return (

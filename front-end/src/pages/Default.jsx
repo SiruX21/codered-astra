@@ -9,6 +9,10 @@ import { Previews } from "../components/Previews";
 import { useEffect } from "react";
 import { Footer } from "../components/Footer";
 
+function LoadingScreen() {
+  return 
+}
+
 function Instructions() {
   return (
     <>
@@ -21,11 +25,15 @@ function Instructions() {
       <section className="w-4/5 flex flex-col items-center space-y-7 mb-14">
         <div className="flex flex-row justify-between">
           <div className="w-3/5 text-left space-y-7">
-            <div>
+            <div className="space-y-2">
               <h1 className="text-black">Step 1.</h1>
               <h2 className="text-black text-3xl">
                 Take a picture of your whole body selfie! Like this image on
-                right. Use the camera button to take a live picture of your
+                right.
+              </h2>
+
+              <h2 className="text-black text-3xl">
+                Use the camera button to take a live picture of your
                 whole body selfie!
               </h2>
             </div>
@@ -45,7 +53,7 @@ function Instructions() {
         </div>
 
         <div className="flex flex-row-reverse justify-between">
-          <div className="w-3/5 text-left space-y-7">
+          <div className="w-3/5 text-left space-y-4">
             <div>
               <h1 className="text-black">Step 2.</h1>
               <h2 className="text-black text-3xl font-bold">
@@ -53,7 +61,7 @@ function Instructions() {
               </h2>
             </div>
 
-            <div className="space-y-7">
+            <div className="space-y-5">
               <h2 className="text-black text-3xl">
                 Just drag and drop that image into our file uploader!
               </h2>
@@ -91,6 +99,7 @@ export function DefaultApp() {
   useEffect(() => {
     document.body.style.backgroundImage = "url(/main/bgs/main1.jpg)"; // use /public path form
     document.body.style.backgroundSize = "contain";
+    document.body.style.backgroundRepeat = "repeat";
     return () => {
       document.body.style.backgroundImage = "";
       document.body.style.backgroundSize = "";
@@ -99,7 +108,7 @@ export function DefaultApp() {
 
   return (
     <div className="flex flex-col">
-      <div className="pt-10 !bg-[#f7c3ef] h-full w-full flex flex-col items-center bg-black text-white space-y-9">
+      <div className="pt-10 !bg-[#f7c3ef] h-full w-[1280px] flex flex-col items-center bg-black text-white space-y-9">
         <div className="bg-black p-10 space-y-5">
           <h1 className="text-[2.7rem]! font-bold text-white">
             "The righteous care for the needs of their animals,"
