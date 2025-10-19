@@ -4,7 +4,8 @@ import { useDropzone } from "react-dropzone";
 export function Previews() {
   const [file, setFile] = useState(null);
   const [processing, setProcessing] = useState(false);
-  const [response, setResponse] = useState(null);
+  const [fursonaName, setFursonaName] = useState(null);
+  const [fursonaDescription, setFursonaDescription] = useState(null);
   const [showCamera, setShowCamera] = useState(false);
   const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
@@ -57,10 +58,13 @@ export function Previews() {
         throw new Error(data.message || "Flask server error");
       }
 
-      setResponse(data.gemini_response?.text || "No response from Gemini.");
+      // Extract fursona name and description from response
+      setFursonaName(data.gemini_response?.fursona_name || "unknown");
+      setFursonaDescription(data.gemini_response?.fursona_description || "A unique match!");
     } catch (err) {
       console.error("Upload error:", err);
-      setResponse("⚠️ Error uploading to Flask backend");
+      setFursonaName("error");
+      setFursonaDescription("⚠️ Error uploading to Flask backend");
     } finally {
       setProcessing(false);
     }
@@ -236,7 +240,7 @@ export function Previews() {
     <section className="container mx-auto px-6 py-10">
       {/* Camera Modal - Seamless overlay */}
       {showCamera && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black bg-opacity-30">
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-3xl w-full animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-800">📷 Take a Photo</h2>
@@ -329,19 +333,26 @@ export function Previews() {
           <div className="flex flex-col justify-center items-center max-w-md">
             {processing ? (
               <h1 className="text-4xl font-bold rainbow-text">Processing...</h1>
-            ) : response ? (
+            ) : fursonaName ? (
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">Your Fursona:</h2>
                 <img 
-                  src={`/${response.trim().toLowerCase()}.PNG`} 
-                  alt={response}
+                  src={`/${fursonaName.trim().toLowerCase()}.PNG`} 
+                  alt={fursonaName}
                   className="w-full max-w-sm rounded-lg shadow-md"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = '/placeholder.png'; // fallback image
                   }}
                 />
-                <p className="text-gray-700 text-center mt-4 text-xl font-semibold capitalize">{response}</p>
+                <p className="text-gray-700 text-center mt-4 text-xl font-semibold capitalize">{fursonaName}</p>
+                {fursonaDescription && (
+                  <div className="mt-4 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                    <p className="text-gray-700 text-center text-sm leading-relaxed italic">
+                      {fursonaDescription}
+                    </p>
+                  </div>
+                )}
               </div>
             ) : null}
           </div>
