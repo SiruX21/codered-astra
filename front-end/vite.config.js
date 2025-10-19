@@ -5,4 +5,13 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    host: true, // Expose to network
+    port: 5173,
+    allowedHosts: [
+      'fursona.siru.dev',
+      'localhost',
+      '.siru.dev', // Allow all subdomains
+    ],
+  },
 })

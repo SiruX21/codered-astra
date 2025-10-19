@@ -25,6 +25,7 @@ function Instructions() {
               <h2 className="text-black text-3xl">
                 Take a picture of your whole body selfie! Like this image on
                 right.
+                Use the camera button to take a live picture of your whole body selfie!
               </h2>
             </div>
 

@@ -47,7 +47,7 @@ export function Previews() {
       const formData = new FormData();
       formData.append("image", file);
 
-      const res = await fetch("http://localhost:5000/analyze-image", {
+      const res = await fetch("https://apifursona.siru.dev/analyze-image", {
         method: "POST",
         body: formData,
       });
@@ -348,7 +348,7 @@ export function Previews() {
                 <p className="text-gray-700 text-center mt-4 text-xl font-semibold capitalize">{fursonaName}</p>
                 {fursonaDescription && (
                   <div className="mt-4 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-                    <p className="text-gray-700 text-center text-sm leading-relaxed italic">
+                    <p className="text-gray-700 text-center text-base leading-relaxed">
                       {fursonaDescription}
                     </p>
                   </div>
