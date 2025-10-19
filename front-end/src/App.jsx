@@ -47,10 +47,10 @@ function App() {
 
   if (!agree) {
     return (
-      <div className="flex w-full justify-center">
-        <img className="w-[700px]" src="/main/bgs/left.png"/>
+      <div className="flex justify-between">
+        <img className="w-1/4 h-[500px]" src="/main/bgs/left.png"/>
 
-        <div className="w-[1280px] flex flex-col bg-[#691125] items-center min-h-screen text-white">
+        <div className="w-1/2 flex flex-col bg-[#691125] items-center min-h-screen text-white">
           <a className="text-4xl" href="/">
             <img src={fursonaLogo} className="logo" alt="fursona logo" />
           </a>
@@ -74,7 +74,7 @@ function App() {
           </button>
         </div>
 
-        <img className="w-[700px]" src="/main/bgs/right.png"/>
+        <img className="w-1/4" src="/main/bgs/right.png"/>
       </div>
     );
   } else {
@@ -82,7 +82,7 @@ function App() {
       <>
         {/* <img className="absolute" src={firebg} /> */}
 
-        <div className="flex flex-col items-center min-h-screen text-white">
+        <div className="flex w-full flex-col items-center min-h-screen text-white">
           <img
             src={fireBg}
             className="absolute w-full h-full mix-blend-screen"
