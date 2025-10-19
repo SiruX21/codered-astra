@@ -18,36 +18,31 @@ Use this checklist to ensure everything is set up correctly.
 - [ ] Stripe Test API keys from https://dashboard.stripe.com/test/apikeys
 - [ ] Stripe CLI installed (for webhooks): https://stripe.com/docs/stripe-cli
 
-### 3. ✅ Backend Configuration
+### 3. ✅ Environment Configuration (Docker)
 
-- [ ] Navigate to `backend/` folder
+- [ ] Navigate to root folder
 - [ ] Copy `.env.example` to `.env`
-- [ ] Fill in `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
-- [ ] Add `JWT_SECRET` (generate random string: https://randomkeygen.com/)
+- [ ] Generate `JWT_SECRET`:
+  ```powershell
+  $bytes = New-Object Byte[] 32
+  [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+  [Convert]::ToBase64String($bytes)
+  ```
 - [ ] Add `OPENAI_API_KEY`
 - [ ] Add `STRIPE_SECRET_KEY` (starts with `sk_test_`)
-- [ ] Run `npm install`
-
-### 4. ✅ Frontend Configuration
-
-- [ ] Navigate to `frontend/` folder
-- [ ] Copy `.env.example` to `.env`
-- [ ] Set `VITE_API_URL=http://localhost:3001/api`
 - [ ] Add `VITE_STRIPE_PUBLISHABLE_KEY` (starts with `pk_test_`)
-- [ ] Run `npm install`
+- [ ] Configure database credentials (or use defaults)
+- [ ] Save `.env` file
 
-### 5. ✅ Database Setup
+**📖 See [DOCKER_ENV_SETUP.md](DOCKER_ENV_SETUP.md) for detailed instructions**
 
-**Option A: Local MariaDB**
-- [ ] Install MariaDB locally
-- [ ] Start MariaDB service
-- [ ] Run migrations: `cd backend && npm run migrate`
+### 4. ✅ Stripe Product Setup (Same as before)
 
-**Option B: Docker**
+### 5. ✅ Database Setup (Docker Automatic)
+
+**Docker handles this automatically!**
 - [ ] Ensure Docker Desktop is running
-- [ ] Run `docker-compose up mariadb -d`
-- [ ] Wait 10 seconds for DB to initialize
-- [ ] Run migrations: `cd backend && npm run migrate`
+- [ ] Database will be created when you start docker-compose
 
 ### 6. ✅ Stripe Product Setup
 
@@ -84,23 +79,30 @@ Use this checklist to ensure everything is set up correctly.
 
 ### 8. ✅ Start the Application
 
-**Option A: Local Development**
+**With Docker (Recommended):**
+```powershell
+# Make sure Docker Desktop is running
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+```
+
+**Without Docker (Development):**
 ```powershell
 # Terminal 1 - Backend
 cd backend
+npm install
+npm run migrate
 npm run dev
 
-# Terminal 2 - Frontend
+# Terminal 2 - Frontend  
 cd frontend
+npm install
 npm run dev
 
 # Terminal 3 - Stripe Webhooks
 stripe listen --forward-to localhost:3001/api/webhook/stripe
-```
-
-**Option B: Docker**
-```powershell
-docker-compose up --build
 ```
 
 ### 9. ✅ Verify Everything Works

@@ -3,7 +3,6 @@ import { useAuth } from './context/AuthContext'
 import api from './services/api'
 import Auth from './components/Auth'
 import Subscription from './components/Subscription'
-import './App.css'
 
 function App() {
   const { user, subscription, logout, refreshSubscription, isAuthenticated } = useAuth()
@@ -22,18 +21,28 @@ function App() {
 
   if (showSubscription) {
     return (
-      <div className="app">
-        <header className="header">
-          <div className="header-content">
-            <h1>🎨 Fursona Generator</h1>
-            <div className="user-menu">
-              <span>{user?.email}</span>
-              <button onClick={() => setShowSubscription(false)} className="nav-button">
-                Home
-              </button>
-              <button onClick={logout} className="logout-button">
-                Logout
-              </button>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex justify-between items-center flex-wrap gap-4">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
+                🎨 Fursona Generator
+              </h1>
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-gray-600 text-sm">{user?.email}</span>
+                <button 
+                  onClick={() => setShowSubscription(false)} 
+                  className="px-4 py-2 border-2 border-primary-500 text-primary-500 rounded-lg font-bold hover:bg-primary-500 hover:text-white transition-all"
+                >
+                  Home
+                </button>
+                <button 
+                  onClick={logout} 
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-all"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </header>
@@ -139,68 +148,85 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="header-content">
-          <div>
-            <h1>🎨 Fursona Generator</h1>
-            <p>Upload an image and let AI create your unique fursona!</p>
-          </div>
-          <div className="user-menu">
-            <span className="user-email">{user?.email}</span>
-            {subscription && (
-              <div className="subscription-badge">
-                <span className="plan-name">{subscription.plan_type}</span>
-                <span className="usage">
-                  {subscription.generations_used}/{subscription.generations_limit === 999999 ? '∞' : subscription.generations_limit}
-                </span>
-              </div>
-            )}
-            <button onClick={() => setShowSubscription(true)} className="nav-button">
-              Plans
-            </button>
-            <button onClick={logout} className="logout-button">
-              Logout
-            </button>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center flex-wrap gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent mb-2">
+                🎨 Fursona Generator
+              </h1>
+              <p className="text-gray-600 text-sm sm:text-base">Upload an image and let AI create your unique fursona!</p>
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-gray-600 text-sm">{user?.email}</span>
+              {subscription && (
+                <div className="bg-primary-50 px-4 py-2 rounded-full flex items-center gap-2">
+                  <span className="font-bold text-primary-500 uppercase text-xs">{subscription.plan_type}</span>
+                  <span className="text-gray-600 text-xs">
+                    {subscription.generations_used}/{subscription.generations_limit === 999999 ? '∞' : subscription.generations_limit}
+                  </span>
+                </div>
+              )}
+              <button 
+                onClick={() => setShowSubscription(true)} 
+                className="px-4 py-2 border-2 border-primary-500 text-primary-500 rounded-lg font-bold hover:bg-primary-500 hover:text-white transition-all"
+              >
+                Plans
+              </button>
+              <button 
+                onClick={logout} 
+                className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-all"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="main-content">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8 flex flex-col items-center gap-8">
         {!preview ? (
           <div
-            className={`dropzone ${isDragging ? 'dragging' : ''}`}
+            className={`w-full min-h-[400px] border-3 border-dashed rounded-[20px] flex items-center justify-center cursor-pointer transition-all ${
+              isDragging 
+                ? 'border-secondary-500 bg-primary-100 scale-105' 
+                : 'border-primary-500 bg-primary-50 hover:border-secondary-500 hover:bg-primary-100 hover:scale-[1.02]'
+            }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <div className="dropzone-content">
-              <div className="upload-icon">📸</div>
-              <h2>Drop your image here</h2>
-              <p>or click to browse</p>
-              <p className="file-types">Supports: JPG, PNG, GIF, WebP</p>
+            <div className="text-center p-8">
+              <div className="text-7xl mb-4 animate-float">📸</div>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-2">Drop your image here</h2>
+              <p className="text-lg text-gray-600 mb-4">or click to browse</p>
+              <p className="text-sm text-gray-500">Supports: JPG, PNG, GIF, WebP</p>
             </div>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={handleFileInput}
-              style={{ display: 'none' }}
+              className="hidden"
             />
           </div>
         ) : (
-          <div className="preview-section">
-            <div className="image-preview">
-              <img src={preview} alt="Uploaded preview" />
-              <button className="reset-btn" onClick={handleReset}>
+          <div className="w-full flex flex-col items-center gap-8">
+            <div className="relative w-full max-w-2xl rounded-[20px] overflow-hidden shadow-2xl">
+              <img src={preview} alt="Uploaded preview" className="w-full h-auto block" />
+              <button 
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 hover:bg-red-500 text-gray-800 hover:text-white text-xl flex items-center justify-center shadow-lg transition-all hover:rotate-90"
+                onClick={handleReset}
+              >
                 ✕
               </button>
             </div>
 
             {!result && (
               <button
-                className="generate-btn"
+                className="px-12 py-4 text-xl font-bold rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                 onClick={handleGenerate}
                 disabled={loading}
               >
@@ -209,16 +235,23 @@ function App() {
             )}
 
             {result && (
-              <div className="result-section">
-                <h2>Your Fursona:</h2>
-                <div className="result-content">
+              <div className="w-full animate-fadeIn">
+                <h2 className="text-3xl font-semibold text-center mb-4 text-gray-800">Your Fursona:</h2>
+                <div className="bg-primary-50 rounded-[15px] p-8 whitespace-pre-wrap leading-relaxed text-gray-800 shadow-md">
                   {result}
                 </div>
-                <div className="action-buttons">
-                  <button className="generate-btn" onClick={handleGenerate} disabled={loading}>
+                <div className="flex gap-4 justify-center mt-8 flex-wrap">
+                  <button 
+                    className="px-8 py-3 text-lg font-bold rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                    onClick={handleGenerate} 
+                    disabled={loading}
+                  >
                     {loading ? '✨ Regenerating...' : '🔄 Regenerate'}
                   </button>
-                  <button className="secondary-btn" onClick={handleReset}>
+                  <button 
+                    className="px-8 py-3 text-lg font-bold rounded-full border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all"
+                    onClick={handleReset}
+                  >
                     🆕 New Image
                   </button>
                 </div>
@@ -228,17 +261,23 @@ function App() {
         )}
 
         {error && (
-          <div className="error-message">
+          <div className="bg-red-500 text-white px-8 py-4 rounded-lg text-lg text-center animate-shake shadow-lg">
             ⚠️ {error}
           </div>
         )}
       </main>
 
-      <footer className="footer">
-        <p>💡 Tip: Upload photos of pets, yourself, or anything for inspiration!</p>
+      <footer className="text-center py-8 text-gray-500">
+        <p className="mb-2">💡 Tip: Upload photos of pets, yourself, or anything for inspiration!</p>
         {subscription && subscription.plan_type === 'free' && (
-          <p className="upgrade-hint">
-            Running low on generations? <button onClick={() => setShowSubscription(true)} className="upgrade-link">Upgrade your plan</button>
+          <p className="text-primary-500">
+            Running low on generations?{' '}
+            <button 
+              onClick={() => setShowSubscription(true)} 
+              className="underline font-bold hover:text-secondary-500 transition-colors"
+            >
+              Upgrade your plan
+            </button>
           </p>
         )}
       </footer>

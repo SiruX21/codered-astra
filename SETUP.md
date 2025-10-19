@@ -56,23 +56,29 @@ Visit: http://localhost:5173
 
 ## For Docker Deployment
 
-### 1. Copy environment files
+### 1. Copy environment file
 
 ```powershell
-cd backend
-cp .env.example .env
+Copy-Item .env.example .env
 # Edit .env with your credentials
-
-cd ../frontend
-cp .env.example .env
-# Edit .env (use http://localhost:3001/api for local Docker)
 ```
 
-### 2. Start everything
+### 2. Fill in required values
+
+Open `.env` and configure:
+- `JWT_SECRET` - Generate with: `openssl rand -base64 32`
+- `OPENAI_API_KEY` - From https://platform.openai.com/api-keys
+- `STRIPE_SECRET_KEY` - From https://dashboard.stripe.com/test/apikeys
+- `VITE_STRIPE_PUBLISHABLE_KEY` - From Stripe Dashboard
+- `BASIC_PLAN_PRICE_ID` - After creating Stripe product
+- `PRO_PLAN_PRICE_ID` - After creating Stripe product
+
+**📖 See [DOCKER_ENV_SETUP.md](DOCKER_ENV_SETUP.md) for detailed instructions**
+
+### 3. Start everything
 
 ```powershell
-cd ..
-docker-compose up --build
+docker-compose up -d
 ```
 
 Visit: http://localhost:3000

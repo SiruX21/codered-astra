@@ -20,9 +20,56 @@ router.post('/generate', authenticateToken, checkSubscriptionLimit, async (req, 
     let description;
 
     // Call LLM API based on provider
-    const provider = process.env.LLM_PROVIDER || 'openai';
+    const provider = process.env.LLM_PROVIDER || 'gemini';
 
-    if (provider === 'openai') {
+    if (provider === 'gemini') {
+      // Google Gemini API
+      const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+      
+      if (!apiKey) {
+        throw new Error('GEMINI_API_KEY not configured');
+      }
+
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          contents: [
+            {
+              parts: [
+                {
+                  text: 'Based on this image, create a detailed fursona description. Include: species, colors, personality traits, unique features, and a creative backstory. Make it fun and engaging! Format it nicely with markdown-style formatting.'
+                },
+                {
+                  inline_data: {
+                    mime_type: 'image/jpeg',
+                    data: base64Image
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.9,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          }
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.data.candidates || response.data.candidates.length === 0) {
+        throw new Error('No response from Gemini API');
+      }
+
+      description = response.data.candidates[0].content.parts[0].text;
+      
+    } else if (provider === 'openai') {
+      // OpenAI GPT-4 Vision API
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {

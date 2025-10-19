@@ -26,7 +26,7 @@ codered-astra/
 ### Frontend
 - React 19
 - Vite
-- CSS3 with animations
+- Tailwind CSS
 - Context API for state management
 
 ### Backend
@@ -53,36 +53,28 @@ git clone https://github.com/SiruX21/codered-astra.git
 cd codered-astra
 ```
 
-### 2. Configure Backend
+### 2. Configure Environment Variables
 ```bash
-cd backend
+# Copy the example file
 cp .env.example .env
+
+# Edit with your actual values
+# See DOCKER_ENV_SETUP.md for detailed instructions
 ```
 
-Edit `backend/.env` with your credentials:
-```env
-JWT_SECRET=your_secure_random_string
-STRIPE_SECRET_KEY=sk_test_your_stripe_key
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
-OPENAI_API_KEY=your_openai_api_key
-```
+Edit `.env` with your credentials:
+- `JWT_SECRET` - Random secure string
+- `OPENAI_API_KEY` - Your OpenAI API key
+- `STRIPE_SECRET_KEY` - Your Stripe secret key
+- `VITE_STRIPE_PUBLISHABLE_KEY` - Your Stripe publishable key
+- `BASIC_PLAN_PRICE_ID` - Stripe Basic plan price ID
+- `PRO_PLAN_PRICE_ID` - Stripe Pro plan price ID
 
-### 3. Configure Frontend
+**📖 For detailed setup instructions, see [DOCKER_ENV_SETUP.md](DOCKER_ENV_SETUP.md)**
+
+### 3. Start with Docker
 ```bash
-cd ../frontend
-cp .env.example .env
-```
-
-Edit `frontend/.env`:
-```env
-VITE_API_URL=http://localhost:3001/api
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
-```
-
-### 4. Start with Docker
-```bash
-cd ..
-docker-compose up --build
+docker-compose up -d
 ```
 
 The application will be available at:

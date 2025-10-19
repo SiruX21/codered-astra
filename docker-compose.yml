@@ -7,12 +7,12 @@ services:
     container_name: fursona-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: fursona_db
-      MYSQL_USER: fursonauser
-      MYSQL_PASSWORD: fursonapass
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-fursona_db}
+      MYSQL_USER: ${DB_USER:-fursonauser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-fursonapass}
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3306}:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -31,17 +31,25 @@ services:
     container_name: fursona-backend
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "${BACKEND_PORT:-3001}:3001"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV:-production}
       - PORT=3001
       - DB_HOST=mariadb
       - DB_PORT=3306
-      - DB_USER=fursonauser
-      - DB_PASSWORD=fursonapass
-      - DB_NAME=fursona_db
-    env_file:
-      - ./backend/.env
+      - DB_USER=${DB_USER:-fursonauser}
+      - DB_PASSWORD=${DB_PASSWORD:-fursonapass}
+      - DB_NAME=${DB_NAME:-fursona_db}
+      - JWT_SECRET=${JWT_SECRET}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      - BASIC_PLAN_PRICE_ID=${BASIC_PLAN_PRICE_ID}
+      - PRO_PLAN_PRICE_ID=${PRO_PLAN_PRICE_ID}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
     depends_on:
       mariadb:
         condition: service_healthy
@@ -55,10 +63,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3001/api}
+        - VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
     container_name: fursona-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "${FRONTEND_PORT:-3000}:80"
     depends_on:
       - backend
     networks:

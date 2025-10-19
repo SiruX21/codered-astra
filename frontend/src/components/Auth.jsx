@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import './Auth.css';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -30,21 +29,21 @@ export default function Auth() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1 className="auth-title">
+    <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-primary-500 to-secondary-500">
+      <div className="bg-white rounded-[20px] p-12 w-full max-w-md shadow-2xl animate-slideUp">
+        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">
           {isLogin ? 'Welcome Back! 👋' : 'Create Account 🎨'}
         </h1>
-        <p className="auth-subtitle">
+        <p className="text-center text-gray-600 mb-8">
           {isLogin 
             ? 'Sign in to continue generating fursonas' 
             : 'Join us and start creating amazing fursonas'}
         </p>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           {!isLogin && (
-            <div className="form-group">
-              <label htmlFor="name">Name</label>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="name" className="font-semibold text-gray-800 text-sm">Name</label>
               <input
                 type="text"
                 id="name"
@@ -52,12 +51,13 @@ export default function Auth() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
                 required={!isLogin}
+                className="px-4 py-3 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:border-primary-500 transition-colors"
               />
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="email" className="font-semibold text-gray-800 text-sm">Email</label>
             <input
               type="email"
               id="email"
@@ -65,11 +65,12 @@ export default function Auth() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
+              className="px-4 py-3 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:border-primary-500 transition-colors"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="font-semibold text-gray-800 text-sm">Password</label>
             <input
               type="password"
               id="password"
@@ -78,28 +79,33 @@ export default function Auth() {
               placeholder="••••••••"
               required
               minLength={6}
+              className="px-4 py-3 border-2 border-gray-200 rounded-lg text-base focus:outline-none focus:border-primary-500 transition-colors"
             />
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="bg-red-500 text-white px-4 py-3 rounded-lg animate-shake">
+              {error}
+            </div>
+          )}
 
           <button 
             type="submit" 
-            className="auth-button"
+            className="mt-4 px-4 py-3 text-lg font-bold rounded-lg bg-gradient-to-r from-primary-500 to-secondary-500 text-white hover:-translate-y-0.5 hover:shadow-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             disabled={loading}
           >
             {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Sign Up'}
           </button>
         </form>
 
-        <div className="auth-switch">
+        <div className="text-center mt-8 text-gray-600">
           {isLogin ? "Don't have an account? " : 'Already have an account? '}
           <button 
             onClick={() => {
               setIsLogin(!isLogin);
               setError('');
             }}
-            className="switch-button"
+            className="text-primary-500 font-bold underline hover:text-secondary-500 transition-colors"
           >
             {isLogin ? 'Sign Up' : 'Sign In'}
           </button>
