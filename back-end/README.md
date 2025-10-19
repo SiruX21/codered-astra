@@ -1,11 +1,13 @@
-# Flask Image Upload API
+# Flask Image Analysis API with Google Gemini
 
-A simple Flask API endpoint that receives images and responds with image details.
+A Flask API endpoint that receives images and analyzes them using Google Gemini AI.
 
 ## Features
 
 - ✅ Upload images via POST request
 - ✅ Image validation and processing
+- ✅ Google Gemini AI image analysis
+- ✅ Custom prompts for targeted analysis
 - ✅ Support for multiple image formats (PNG, JPG, JPEG, GIF, BMP, WEBP)
 - ✅ File size limit (16MB)
 - ✅ Error handling
@@ -18,7 +20,15 @@ A simple Flask API endpoint that receives images and responds with image details
 pip install -r requirements.txt
 ```
 
-2. Run the server:
+2. Set up your Google API Key:
+   - Get your API key from: https://makersuite.google.com/app/apikey
+   - Copy `.env.example` to `.env`
+   - Add your API key to the `.env` file:
+   ```
+   GOOGLE_API_KEY=your_actual_api_key_here
+   ```
+
+3. Run the server:
 ```bash
 python main.py
 ```
@@ -27,27 +37,31 @@ The server will start on `http://localhost:5000`
 
 ## API Endpoints
 
-### POST /upload-image
-Upload an image file.
+### POST /analyze-image
+Upload an image file and get AI analysis from Google Gemini.
 
 **Request:**
 - Method: `POST`
 - Content-Type: `multipart/form-data`
-- Body: Form data with key `image` containing the image file
+- Body: 
+  - `image` (file, required): The image file to analyze
+  - `prompt` (string, optional): Custom prompt for analysis (default: "Describe this image in detail.")
 
 **Response:**
 ```json
 {
   "success": true,
-  "message": "Image received successfully",
+  "message": "Image analyzed successfully",
   "image_details": {
     "filename": "example.jpg",
     "width": 1920,
     "height": 1080,
     "format": "JPEG",
-    "mode": "RGB",
-    "size_bytes": 245678,
     "saved_path": "uploads/example.jpg"
+  },
+  "gemini_response": {
+    "text": "This image shows a beautiful sunset over the ocean...",
+    "prompt_used": "Describe this image in detail."
   }
 }
 ```
@@ -67,21 +81,40 @@ Health check endpoint.
 
 ### Using curl:
 ```bash
-curl -X POST -F "image=@/path/to/your/image.jpg" http://localhost:5000/upload-image
+# Basic analysis
+curl -X POST -F "image=@/path/to/your/image.jpg" http://localhost:5000/analyze-image
+
+# With custom prompt
+curl -X POST \
+  -F "image=@/path/to/your/image.jpg" \
+  -F "prompt=What colors are dominant in this image?" \
+  http://localhost:5000/analyze-image
 ```
 
 ### Using the test script:
 ```bash
+# Basic analysis
 python test_upload.py /path/to/your/image.jpg
+
+# With custom prompt
+python test_upload.py /path/to/your/image.jpg "What objects are in this image?"
 ```
 
 ### Using Python requests:
 ```python
 import requests
 
-url = 'http://localhost:5000/upload-image'
+url = 'http://localhost:5000/analyze-image'
+
+# Basic analysis
 files = {'image': open('image.jpg', 'rb')}
 response = requests.post(url, files=files)
+print(response.json())
+
+# With custom prompt
+files = {'image': open('image.jpg', 'rb')}
+data = {'prompt': 'What is the main subject of this image?'}
+response = requests.post(url, files=files, data=data)
 print(response.json())
 ```
 
