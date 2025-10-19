@@ -74,6 +74,13 @@ cat
 chicken
 snake
 squirrel
+bear
+dog
+frog
+horse
+peacock
+rabbit
+turtle
 
 Pick the one that best matches the image's vibe. Pick Squirrel and elephant less, squirrel gets picked a lot - try to pick every animal equally.
 
