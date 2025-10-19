@@ -1,6 +1,41 @@
 @import "tailwindcss";
 
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@layer utilities {
+  .rainbow-text {
+    background: var(--bg-rainbow);
+    background-size: 300% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: var(--animate-rainbow);
+  }
+}
+
 :root {
+  --animate-rainbow: rainbow-shift 4s linear infinite;
+  --bg-rainbow: linear-gradient(
+    90deg,
+    red,
+    orange,
+    yellow,
+    green,
+    cyan,
+    blue,
+    violet
+  );
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -11,6 +46,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.text-stroke-custom {
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 1px 0 #000;
+  /* Adjust color and offset as needed */
 }
 
 a {
@@ -34,7 +75,6 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
-
 
 @media (prefers-color-scheme: light) {
   :root {
