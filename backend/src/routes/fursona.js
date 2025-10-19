@@ -1,53 +1,40 @@
 import express from 'express';
 import axios from 'axios';
-import db from '../db/database.js';
-import { authenticateToken, checkSubscriptionLimit } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Generate fursona
-router.post('/generate', authenticateToken, checkSubscriptionLimit, async (req, res) => {
+// Generate fursona (no auth required)
+router.post('/generate', async (req, res) => {
   try {
-    const { image } = req.body; // base64 encoded image
+    const { image } = req.body;
 
     if (!image) {
       return res.status(400).json({ error: 'Image required' });
     }
 
-    // Remove data URL prefix if present
     const base64Image = image.replace(/^data:image\/\w+;base64,/, '');
+    const provider = process.env.LLM_PROVIDER || 'gemini';
+    const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || 
+      'Based on this image, create a detailed fursona description. Include: species, colors, personality traits, unique features, and a creative backstory. Make it fun and engaging!';
 
     let description;
 
-    // Call LLM API based on provider
-    const provider = process.env.LLM_PROVIDER || 'gemini';
-
     if (provider === 'gemini') {
-      // Google Gemini API
-      const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY;
       
       if (!apiKey) {
         throw new Error('GEMINI_API_KEY not configured');
       }
 
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
-          contents: [
-            {
-              parts: [
-                {
-                  text: 'Based on this image, create a detailed fursona description. Include: species, colors, personality traits, unique features, and a creative backstory. Make it fun and engaging! Format it nicely with markdown-style formatting.'
-                },
-                {
-                  inline_data: {
-                    mime_type: 'image/jpeg',
-                    data: base64Image
-                  }
-                }
-              ]
-            }
-          ],
+          contents: [{
+            parts: [
+              { text: systemPrompt },
+              { inline_data: { mime_type: 'image/jpeg', data: base64Image } }
+            ]
+          }],
           generationConfig: {
             temperature: 0.9,
             topK: 40,
@@ -55,11 +42,7 @@ router.post('/generate', authenticateToken, checkSubscriptionLimit, async (req, 
             maxOutputTokens: 1024,
           }
         },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { headers: { 'Content-Type': 'application/json' } }
       );
 
       if (!response.data.candidates || response.data.candidates.length === 0) {
@@ -69,28 +52,17 @@ router.post('/generate', authenticateToken, checkSubscriptionLimit, async (req, 
       description = response.data.candidates[0].content.parts[0].text;
       
     } else if (provider === 'openai') {
-      // OpenAI GPT-4 Vision API
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
           model: 'gpt-4-vision-preview',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: 'Based on this image, create a detailed fursona description. Include: species, colors, personality traits, unique features, and a creative backstory. Make it fun and engaging! Format it nicely with markdown.'
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64Image}`
-                  }
-                }
-              ]
-            }
-          ],
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: systemPrompt },
+              { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
+            ]
+          }],
           max_tokens: 1000
         },
         {
@@ -106,69 +78,13 @@ router.post('/generate', authenticateToken, checkSubscriptionLimit, async (req, 
       throw new Error(`Unsupported LLM provider: ${provider}`);
     }
 
-    // Save to database
-    const [result] = await db.query(
-      'INSERT INTO fursonas (user_id, description) VALUES (?, ?)',
-      [req.user.id, description]
-    );
-
-    // Update generation count
-    await db.query(
-      'UPDATE subscriptions SET generations_used = generations_used + 1 WHERE user_id = ?',
-      [req.user.id]
-    );
-
-    // Get updated subscription info
-    const [subscriptions] = await db.query(
-      'SELECT generations_used, generations_limit, plan_type FROM subscriptions WHERE user_id = ?',
-      [req.user.id]
-    );
-
-    res.json({
-      id: result.insertId,
-      description,
-      subscription: subscriptions[0]
-    });
+    res.json({ description });
   } catch (error) {
     console.error('Fursona generation error:', error.response?.data || error.message);
     res.status(500).json({ 
       error: 'Failed to generate fursona',
       details: error.response?.data?.error || error.message
     });
-  }
-});
-
-// Get user's fursonas
-router.get('/history', authenticateToken, async (req, res) => {
-  try {
-    const [fursonas] = await db.query(
-      'SELECT id, description, created_at FROM fursonas WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
-      [req.user.id]
-    );
-
-    res.json({ fursonas });
-  } catch (error) {
-    console.error('Get fursonas error:', error);
-    res.status(500).json({ error: 'Failed to get fursonas' });
-  }
-});
-
-// Get single fursona
-router.get('/:id', authenticateToken, async (req, res) => {
-  try {
-    const [fursonas] = await db.query(
-      'SELECT * FROM fursonas WHERE id = ? AND user_id = ?',
-      [req.params.id, req.user.id]
-    );
-
-    if (fursonas.length === 0) {
-      return res.status(404).json({ error: 'Fursona not found' });
-    }
-
-    res.json({ fursona: fursonas[0] });
-  } catch (error) {
-    console.error('Get fursona error:', error);
-    res.status(500).json({ error: 'Failed to get fursona' });
   }
 });
 
